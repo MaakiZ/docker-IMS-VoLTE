@@ -1,16 +1,19 @@
-version: '2'
-
-networks:
-  net1.test:
-
 services:
   db:
     build: db/
     ports:
         - 3306:3306
     hostname: db
+    environment:
+      - MYSQL_ROOT_PASSWORD=notkamailio
     volumes:
       - ./db/data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pnotkamailio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       net1.test:
 
@@ -26,7 +29,8 @@ services:
   pcscf:
     build: pcscf/
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./pcscf/config:/usr/local/etc/kamailio
     hostname: pcscf
@@ -41,7 +45,8 @@ services:
   scscf:
     build: scscf/
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./scscf/config:/usr/local/etc/kamailio
     hostname: scscf
@@ -57,7 +62,8 @@ services:
   icscf:
     build: icscf/
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./icscf/config:/usr/local/etc/kamailio
     hostname: icscf
@@ -73,7 +79,8 @@ services:
   fhoss:
     build: fhoss/
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./fhoss/root:/root
       - ./fhoss/config/DiameterPeerHSS.xml:/opt/OpenIMSCore/FHoSS/deploy/DiameterPeerHSS.xml
@@ -88,5 +95,8 @@ services:
       net1.test:
         aliases:
           - hss.net1.test
+
+networks:
+  net1.test:
     
     

@@ -135,5 +135,5 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 # DB access rights
-# grant delete,insert,select,update on icscf.* to icscf@192.168.178.210 identified by 'heslo';
+grant delete,insert,select,update on icscf.* to icscf@'%' identified by 'heslo';
 /* grant delete,insert,select,update on icscf.* to provisioning@localhost identified by 'provi'; */
